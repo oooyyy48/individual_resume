@@ -26,7 +26,7 @@ export const profile: Profile = {
       period: '2024 — 2026',
       organization: '学科竞赛 · 技能认证',
       role: '持续参赛与实践',
-      description: '获得第十六届蓝桥杯省一等奖与省二等奖、团队程序设计天梯赛省三等奖与优秀个人奖，并取得讯飞星火 AI Prompt 工程师认证。',
+      description: '获得第十六届蓝桥杯省二等奖与第十七届省一等奖、团队程序设计天梯赛省三等奖与优秀个人奖，并取得讯飞星火 AI Prompt 工程师认证。',
     },
     {
       period: '2023 — 2024',
