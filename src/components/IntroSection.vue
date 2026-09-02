@@ -1,34 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import type { Profile } from '@/types'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { revealLines, fadeUp } from '@/utils/textReveal'
 
 const { profile } = defineProps<{ profile: Profile }>()
 
-gsap.registerPlugin(ScrollTrigger)
-
-const sectionRef = ref<HTMLElement | null>(null)
 const copyRef = ref<HTMLElement | null>(null)
 const noteRef = ref<HTMLElement | null>(null)
 
-let st: ScrollTrigger | null = null
 let cleanups: Array<() => void> = []
 
 onMounted(() => {
-  if (!sectionRef.value) return
-
-  st = ScrollTrigger.create({
-    trigger: sectionRef.value,
-    start: 'top top',
-    end: 'bottom top',
-    scrub: 1,
-    onUpdate(self) {
-      sectionRef.value!.style.setProperty('--tear-progress', self.progress.toString())
-    },
-  })
-
   if (copyRef.value) {
     cleanups.push(revealLines(copyRef.value, { start: 'top 72%', stagger: 0.12, duration: 1.25 }))
   }
@@ -38,7 +20,6 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  st?.kill()
   cleanups.forEach((fn) => fn())
   cleanups = []
 })
@@ -46,7 +27,7 @@ onUnmounted(() => {
 
 <template>
   <!-- This section provides the scroll distance for the cover to slide up -->
-  <section id="about" ref="sectionRef" class="intro-scroll">
+  <section id="about" class="intro-scroll">
     <!-- Fixed-height spacer → the actual scrolling room for the cover to reveal -->
     <div class="intro-cover">
       <div class="intro-tear" aria-hidden="true"></div>
@@ -104,6 +85,7 @@ onUnmounted(() => {
 .intro-body {
   position: relative;
   z-index: 1;
+  width: min(100%, 46rem);
 }
 
 .intro-label {
@@ -114,12 +96,13 @@ onUnmounted(() => {
 }
 
 .intro-copy {
-  max-width: 22ch;
+  max-width: 34ch;
   margin: 0 auto;
   font-family: var(--display);
-  font-size: 3.8rem;
+  /* ~140 CJK chars must fit the 100vh cover at every width — scale with viewport */
+  font-size: clamp(1.3rem, 0.6rem + 1.85vw, 2.3rem);
   font-weight: 400;
-  line-height: 1.16;
+  line-height: 1.4;
 }
 
 .intro-note {
@@ -144,7 +127,7 @@ onUnmounted(() => {
   }
 
   .intro-copy {
-    font-size: 2.5rem;
+    max-width: 22ch;
   }
 }
 </style>

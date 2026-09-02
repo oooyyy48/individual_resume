@@ -5,11 +5,15 @@ export interface Project {
   subtitle: string
   category: ProjectCategory
   image: string
+  /** Extra shots cycled in the card frame; image stays the cover */
+  images?: string[]
   year: string
   role: string
   result: string
   tags: string[]
   link?: string
+  /** Badge text over the frame, e.g. '正在施工ing' */
+  status?: string
 }
 
 export type ProjectCategory = 'product' | 'creative' | 'system'
@@ -49,6 +53,8 @@ export interface Profile {
   statementEmphasis: string
   bio: string
   email: string
+  secondaryEmail: string
+  qq: string
   resumeUrl: string
   socialLinks: SocialLink[]
   experiences: Experience[]

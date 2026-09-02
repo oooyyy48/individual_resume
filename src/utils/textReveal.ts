@@ -30,6 +30,9 @@ export function revealLines(el: HTMLElement, opts: RevealOptions = {}): () => vo
   let tween: gsap.core.Tween | null = null
   let cancelled = false
 
+  // Hide up front so the un-split text can't flash before the animation starts
+  gsap.set(el, { autoAlpha: 0 })
+
   // Wait for fonts so line breaks are measured correctly
   document.fonts.ready.then(() => {
     if (cancelled) return
@@ -38,7 +41,15 @@ export function revealLines(el: HTMLElement, opts: RevealOptions = {}): () => vo
       type: 'lines',
       mask: 'lines',
       linesClass: 'reveal-line',
+      // SplitText detects line breaks at word (space) boundaries; an unbroken
+      // CJK sentence is one "word", so intra-sentence breaks are never found
+      // and lines overflow their masks. Per-character measuring makes line
+      // detection exact; the char wrappers are unwrapped again after grouping.
+      wordDelimiter: '',
     })
+
+    // Lines now sit tucked below their masks — safe to show again
+    gsap.set(el, { autoAlpha: 1 })
 
     tween = gsap.from(split.lines, {
       yPercent: 115,
@@ -53,6 +64,7 @@ export function revealLines(el: HTMLElement, opts: RevealOptions = {}): () => vo
         // Restore un-split text so later resizes can't clip wrapped lines
         split?.revert()
         split = null
+        gsap.set(el, { clearProps: 'visibility,opacity' })
       },
     })
   })
@@ -62,6 +74,7 @@ export function revealLines(el: HTMLElement, opts: RevealOptions = {}): () => vo
     tween?.scrollTrigger?.kill()
     tween?.kill()
     split?.revert()
+    gsap.set(el, { clearProps: 'visibility,opacity' })
   }
 }
 

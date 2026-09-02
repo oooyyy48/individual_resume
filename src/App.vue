@@ -51,12 +51,12 @@ onUnmounted(() => {
   <main id="content">
     <HeroSection :profile="profile" />
     <IntroSection :profile="profile" />
+    <AboutSection :profile="profile" />
     <StickyGallery
       :projects="projects.slice(0, 4)"
       @card-mouseenter="onCardMouseEnter"
       @card-mouseleave="onCardMouseLeave"
     />
-    <AboutSection :profile="profile" />
     <ContactSection :profile="profile" />
   </main>
 
@@ -157,6 +157,7 @@ button {
 /* Lines split by textReveal.ts slide up inside overflow masks */
 .reveal-line {
   will-change: transform;
+  white-space: nowrap;
 }
 
 .skip-link {

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import type { Profile } from '@/types'
+import gsap from 'gsap'
 import { revealLines, fadeUp } from '@/utils/textReveal'
 
 const { profile } = defineProps<{ profile: Profile }>()
 
+const titleBoxRef = ref<HTMLElement | null>(null)
 const titleRef = ref<HTMLElement | null>(null)
+const lensRef = ref<HTMLElement | null>(null)
 const orbitRef = ref<HTMLElement | null>(null)
 const sideRef = ref<HTMLElement | null>(null)
 const footerRef = ref<HTMLElement | null>(null)
@@ -25,6 +28,41 @@ onMounted(() => {
   if (orbitRef.value) {
     cleanups.push(fadeUp(orbitRef.value, { delay: 1.2, y: 12, duration: 1.4 }))
   }
+
+  // Inversion lens: a circular color-flip that trails the cursor across the title
+  const box = titleBoxRef.value
+  const lens = lensRef.value
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (box && lens && finePointer && !reducedMotion) {
+    const toX = gsap.quickTo(lens, 'x', { duration: 0.45, ease: 'power3' })
+    const toY = gsap.quickTo(lens, 'y', { duration: 0.45, ease: 'power3' })
+
+    const place = (event: MouseEvent) => {
+      const rect = box.getBoundingClientRect()
+      toX(event.clientX - rect.left)
+      toY(event.clientY - rect.top)
+    }
+    const enter = (event: MouseEvent) => {
+      // Snap to the entry point first so the lens never flies in from (0, 0)
+      const rect = box.getBoundingClientRect()
+      gsap.set(lens, { x: event.clientX - rect.left, y: event.clientY - rect.top })
+      gsap.to(lens, { autoAlpha: 1, scale: 1, duration: 0.35, ease: 'power3.out' })
+    }
+    const leave = () => {
+      gsap.to(lens, { autoAlpha: 0, scale: 0.4, duration: 0.3, ease: 'power3.in' })
+    }
+
+    box.addEventListener('mouseenter', enter)
+    box.addEventListener('mousemove', place)
+    box.addEventListener('mouseleave', leave)
+    cleanups.push(() => {
+      box.removeEventListener('mouseenter', enter)
+      box.removeEventListener('mousemove', place)
+      box.removeEventListener('mouseleave', leave)
+      gsap.killTweensOf(lens)
+    })
+  }
 })
 
 onUnmounted(() => {
@@ -37,10 +75,13 @@ onUnmounted(() => {
   <section id="hero" class="hero">
     <div class="hero-inner">
       <div class="hero-main">
-        <h1 ref="titleRef" class="hero-title">
-          {{ profile.statement.replace(profile.statementEmphasis, '') }}
-          <em>{{ profile.statementEmphasis }}</em>
-        </h1>
+        <div ref="titleBoxRef" class="hero-title-box">
+          <h1 ref="titleRef" class="hero-title">
+            {{ profile.statement.replace(profile.statementEmphasis, '') }}
+            <em>{{ profile.statementEmphasis }}</em>
+          </h1>
+          <div ref="lensRef" class="title-lens" aria-hidden="true"></div>
+        </div>
 
         <div ref="sideRef" class="hero-side">
           <p class="hero-side-label">{{ profile.role }}</p>
@@ -52,7 +93,9 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div ref="orbitRef" class="orbit" aria-hidden="true"></div>
+      <div ref="orbitRef" class="orbit" aria-hidden="true">
+        <span class="orbit-satellite"></span>
+      </div>
       <div ref="footerRef" class="hero-footer">
         <span>{{ profile.name }}</span>
         <span class="scroll-line">向下探索</span>
@@ -89,14 +132,43 @@ onUnmounted(() => {
   gap: 3rem;
 }
 
+/* The title's exact width context: the 1fr grid column itself */
+.hero-title-box {
+  position: relative;
+  container-type: inline-size;
+}
+
+/* Circular color-flip lens: inverts the backdrop inside the circle, so the
+   black title turns warm-white on a dark disc that trails the cursor.
+   Sized in cqw so it scales with the fluid title. */
+.title-lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 13cqw;
+  height: 13cqw;
+  /* Center on the tracked point without touching transform (GSAP owns it) */
+  margin: -6.5cqw 0 0 -6.5cqw;
+  border-radius: 50%;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.4);
+  -webkit-backdrop-filter: invert(1) sepia(1) saturate(2) brightness(2.6);
+  backdrop-filter: invert(1) sepia(1) saturate(2) brightness(2.6);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Fluid against the actual column width: one CJK glyph ≈ 1em, so ~9cqw keeps
+   both lines (9 + 10 glyphs + indent) intact at any viewport */
 .hero-title {
-  max-width: 13ch;
   margin: 0;
   font-family: var(--display);
-  font-size: 7rem;
+  font-size: clamp(2.1rem, 9cqw, 7rem);
   font-weight: 400;
   line-height: 0.96;
   letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
 .hero-title em {
@@ -174,7 +246,7 @@ onUnmounted(() => {
 }
 
 .orbit::before,
-.orbit::after {
+.orbit-satellite::before {
   content: "";
   position: absolute;
   border-radius: 50%;
@@ -185,12 +257,27 @@ onUnmounted(() => {
   border: 1px solid color-mix(in oklch, var(--fg) 50%, transparent);
 }
 
-.orbit::after {
+/* Satellite dot orbiting the outer ring; the span spans the orbit so the
+   rotation origin is the ring center and it adapts to any orbit size */
+.orbit-satellite {
+  position: absolute;
+  inset: 0;
+  animation: orbit-spin 16s linear infinite;
+}
+
+.orbit-satellite::before {
   top: -5px;
   left: 50%;
   width: 10px;
   height: 10px;
+  margin-left: -5px;
   background: var(--fg);
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 .hero-footer {
@@ -240,12 +327,6 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 1024px) {
-  .hero-title {
-    font-size: 5.5rem;
-  }
-}
-
 @media (max-width: 720px) {
   .hero-inner {
     min-height: 610px;
@@ -255,15 +336,6 @@ onUnmounted(() => {
   .hero-main {
     grid-template-columns: 1fr;
     gap: 2rem;
-  }
-
-  .hero-title {
-    max-width: 10ch;
-    font-size: 3.65rem;
-  }
-
-  .hero-title em {
-    margin-left: 0.7ch;
   }
 
   .hero-side {

@@ -40,7 +40,7 @@ onUnmounted(() => {
     <p ref="labelRef" class="about-label">02 / 经历与能力</p>
     <div class="about-main">
       <p ref="copyRef" class="about-copy">
-        好的设计不是增加更多，而是找到那个让一切突然变得<em>清晰</em>的决定。
+        我相信持续学习与动手实践，会让每一个模糊的问题逐渐变得<em>清晰</em>。
       </p>
 
       <div ref="experienceRef" class="experience">

@@ -1,8 +1,7 @@
 import type { Project } from '@/types'
 
 export const projects: Project[] = [
-  { id: 'p01', index: '01', name: '乐谱', subtitle: '数字化乐谱交互体验', category: 'product', image: '/01.webp', year: '2025', role: '产品设计', result: '让演奏者在排练中更快找到下一步。', tags: ['产品体验', '交互原型'] },
-  { id: 'p02', index: '02', name: '温感', subtitle: '温度可视化交互装置', category: 'creative', image: '/02.webp', year: '2024', role: '创意开发', result: '把不可见的温度变成可以感知的记忆。', tags: ['互动装置', '创意技术'] },
-  { id: 'p03', index: '03', name: '网格', subtitle: '模块化设计语言', category: 'system', image: '/03.webp', year: '2024', role: '视觉系统', result: '为快速增长的内容团队建立统一的表达秩序。', tags: ['品牌系统', '设计系统'] },
-  { id: 'p04', index: '04', name: '溯源', subtitle: '食品供应链透明化', category: 'product', image: '/04.webp', year: '2023', role: '产品设计', result: '让一条食物的旅程变得清楚而可信。', tags: ['用户研究', '服务设计'] },
+  { id: 'p01', index: '01', name: 'MarkFlow', subtitle: '在线 Markdown 编写工具', category: 'product', image: '/A01.webp', year: '2026', role: '独立开发', result: '将 Markdown 写作、预览与导出整合进一个轻量工作台。', tags: ['Vue', 'Markdown', '全栈应用'], link: 'https://github.com/oooyyy48/Markflow' },
+  { id: 'p02', index: '02', name: 'myUI', subtitle: '个人组件库', category: 'system', image: '/A02.webp', year: '2025', role: '组件设计与实现', result: '沉淀可复用的界面组件，提升个人项目的开发一致性。', tags: ['组件库', 'UI', '开源'], link: 'https://github.com/oooyyy48/myUI' },
+  { id: 'p03', index: '03', name: '学生成绩管理系统', subtitle: '课程成绩管理 Web 应用', category: 'system', image: '/A03.webp', images: ['/A03.webp', '/A04.webp', '/A05.webp'], year: '2026', role: '全栈开发', result: '面向教师与学生的成绩录入、统计与查询流程，正在持续施工中。', tags: ['Vue', 'Node.js', 'SQL'], status: '正在施工ing' },
 ]

@@ -7,7 +7,6 @@ import { useReducedMotion } from '@/composables/useReducedMotion'
 gsap.registerPlugin(ScrollTrigger)
 
 let lenisInstance: Lenis | null = null
-let rafId: number | null = null
 let instanceCount = 0
 
 /**
@@ -32,12 +31,13 @@ export function useLenis() {
   const isReady = ref(false)
   const reducedMotion = useReducedMotion()
 
-  function loop(time: number) {
-    if (!lenisInstance) return
-    lenisInstance.raf(time)
-    scrollY.value = lenisInstance.actualScroll
-    velocity.value = lenisInstance.velocity
-    rafId = requestAnimationFrame(loop)
+  // Drive Lenis from gsap's ticker so scroll updates and GSAP tweens share a
+  // single rAF loop. Separate loops drift out of phase and make scroll-linked
+  // motion (reveals, scrubbed sections) janky.
+  function tickerTick(time: number) {
+    lenisInstance?.raf(time * 1000)
+    scrollY.value = lenisInstance?.actualScroll ?? 0
+    velocity.value = lenisInstance?.velocity ?? 0
   }
 
   function init() {
@@ -59,15 +59,13 @@ export function useLenis() {
       ScrollTrigger.update()
     })
 
-    rafId = requestAnimationFrame(loop)
+    gsap.ticker.add(tickerTick)
+    gsap.ticker.lagSmoothing(0)
     isReady.value = true
   }
 
   function destroy() {
-    if (rafId !== null) {
-      cancelAnimationFrame(rafId)
-      rafId = null
-    }
+    gsap.ticker.remove(tickerTick)
     lenisInstance?.destroy()
     lenisInstance = null
     isReady.value = false
