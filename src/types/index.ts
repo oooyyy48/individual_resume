@@ -60,3 +60,21 @@ export interface Profile {
   experiences: Experience[]
   skills: SkillGroup[]
 }
+
+export interface LifeSection {
+  id: 'hometown' | 'school' | 'interest' | 'album'
+  index: string
+  title: string
+  summary: string
+  detail: string
+  image?: string
+  link?: string
+  direction: 'left' | 'right'
+  bullets?: string[]
+}
+
+export interface AlbumPhoto {
+  src: string
+  alt: string
+  caption: string
+}

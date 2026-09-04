@@ -38,6 +38,7 @@ function go(event: MouseEvent, hash: string) {
       <a href="#about" @click="go($event, '#about')">关于</a>
       <a href="#experience" @click="go($event, '#experience')">经历</a>
       <a href="#works" @click="go($event, '#works')">作品</a>
+      <a href="#life" @click="go($event, '#life')">生活</a>
       <a href="#contact" @click="go($event, '#contact')">联系</a>
     </nav>
 

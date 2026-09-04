@@ -31,6 +31,14 @@ onUnmounted(() => {
     <!-- Fixed-height spacer → the actual scrolling room for the cover to reveal -->
     <div class="intro-cover">
       <div class="intro-tear" aria-hidden="true"></div>
+      <img
+        class="intro-ornament intro-ornament--left"
+        src="/lift.avif"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+      />
 
       <div class="intro-body">
         <p class="intro-label">01 / 关于我</p>
@@ -67,6 +75,25 @@ onUnmounted(() => {
   background: var(--surface);
   overflow: visible;
   pointer-events: auto;
+}
+
+.intro-ornament {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  width: clamp(8rem, 15vw, 14rem);
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.intro-ornament--left {
+  top: 22%;
+  left: clamp(1rem, 5vw, 5rem);
+  opacity: 0.76;
+  transform: rotate(-8deg) scale(0.96);
+  transform-origin: center;
 }
 
 /* ── Wave edge at top of cover ── */
@@ -120,6 +147,14 @@ onUnmounted(() => {
 
   .intro-cover {
     padding: 5rem var(--page-pad) 3rem;
+  }
+
+  .intro-ornament--left {
+    top: 15%;
+    left: -4.6rem;
+    width: 7rem;
+    opacity: 0.34;
+    transform: rotate(-8deg) scale(0.86);
   }
 
   .intro-tear {

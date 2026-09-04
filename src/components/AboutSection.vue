@@ -38,6 +38,14 @@ onUnmounted(() => {
 <template>
   <section id="experience" class="about">
     <p ref="labelRef" class="about-label">02 / 经历与能力</p>
+    <img
+      class="about-ornament about-ornament--right"
+      src="/right.avif"
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+    />
     <div class="about-main">
       <p ref="copyRef" class="about-copy">
         我相信持续学习与动手实践，会让每一个模糊的问题逐渐变得<em>清晰</em>。
@@ -84,6 +92,26 @@ onUnmounted(() => {
   padding: 11rem var(--page-pad);
   background: var(--surface);
   border-top: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.about-ornament {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  width: clamp(7rem, 12vw, 12rem);
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.about-ornament--right {
+  top: 10rem;
+  right: clamp(0.8rem, 2.4vw, 3rem);
+  opacity: 0.62;
+  transform: rotate(7deg) scale(0.94);
+  transform-origin: center;
 }
 
 .about-label {
@@ -98,6 +126,9 @@ onUnmounted(() => {
 .about-main {
   grid-column: 2;
   min-width: 0;
+  position: relative;
+  z-index: 1;
+  padding-right: clamp(3rem, 9vw, 8rem);
 }
 
 .about-copy {
@@ -238,7 +269,18 @@ onUnmounted(() => {
 
   .about-label { position: static; }
 
-  .about-main { grid-column: 1; }
+  .about-main {
+    grid-column: 1;
+    padding-right: 0;
+  }
+
+  .about-ornament--right {
+    top: 7.5rem;
+    right: -4.8rem;
+    width: 6.5rem;
+    opacity: 0.3;
+    transform: rotate(7deg) scale(0.82);
+  }
 
   .about-copy { font-size: 2.55rem; }
 
